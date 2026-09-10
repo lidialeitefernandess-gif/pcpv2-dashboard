@@ -216,14 +216,6 @@ export function Dashboard({
           </CardContent>
         </Card>
 
-        <Card className="rounded-md border-border/70">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Aderência ao plano</CardTitle>
-          </CardHeader>
-          <CardContent className="grid place-items-center">
-            <GaugeCard label="Índice de aderência" value={kpis.aderenciaPlano} hint="OPs dentro do plano" />
-          </CardContent>
-        </Card>
       </section>
 
       {/* Motivos + Tabela */}
