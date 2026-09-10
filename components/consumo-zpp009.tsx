@@ -257,11 +257,12 @@ const pendentes = useMemo(() => {
                     className="border-b last:border-0"
                   >
                     <td className="p-3 font-mono">
-                      {item.op}
-                      <td className="p-3">
+  {item.op}
+</td>
+
+<td className="p-3">
   {item.data}
 </td>
-                    </td>
 
                     <td className="p-3">
                       {item.material}
