@@ -11,6 +11,8 @@ export function ConsumoZpp009({ dados }: Props) {
   const [classeSelecionada, setClasseSelecionada] = useState<Classe>("TODAS")
   const [statusSelecionado, setStatusSelecionado] = useState<StatusFiltro>("TODOS")
   const [busca, setBusca] = useState("")
+  const [dataInicial, setDataInicial] = useState("")
+  const [dataFinal, setDataFinal] = useState("")
 
   const pendentes = useMemo(() => dados.filter((item) => {
     const status = item.status?.trim().toUpperCase() ?? ""
@@ -18,16 +20,28 @@ export function ConsumoZpp009({ dados }: Props) {
     return (status === "SEM CONSUMO" || status === "PARCIAL") && ["A", "B", "C"].includes(classe)
   }), [dados])
 
-  // Status e busca afetam tanto os cards quanto a tabela.
+  const dataParaISO = (valor: string) => {
+    const texto = String(valor ?? "").trim()
+    const br = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+    if (br) return `${br[3]}-${br[2]}-${br[1]}`
+    const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/)
+    if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`
+    return ""
+  }
+
+  // Status, período e busca afetam tanto os cards quanto a tabela.
   const baseFiltrada = useMemo(() => {
     const termo = busca.trim().toLowerCase()
     return pendentes.filter((item) => {
       const statusOk = statusSelecionado === "TODOS" || item.status?.trim().toUpperCase() === statusSelecionado
+      const dataItem = dataParaISO(item.data)
+      const dataInicialOk = !dataInicial || (!!dataItem && dataItem >= dataInicial)
+      const dataFinalOk = !dataFinal || (!!dataItem && dataItem <= dataFinal)
       const buscaOk = !termo || [item.op, item.material, item.descricao, item.data]
         .some((v) => String(v ?? "").toLowerCase().includes(termo))
-      return statusOk && buscaOk
+      return statusOk && dataInicialOk && dataFinalOk && buscaOk
     })
-  }, [pendentes, statusSelecionado, busca])
+  }, [pendentes, statusSelecionado, dataInicial, dataFinal, busca])
 
   const resumo = useMemo(() => {
     const calcular = (classe: "A" | "B" | "C") => {
@@ -92,8 +106,19 @@ export function ConsumoZpp009({ dados }: Props) {
             <option value="SEM CONSUMO">Sem consumo</option>
             <option value="PARCIAL">Parcial</option>
           </select>
+
+          <label className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm">
+            <span className="text-muted-foreground">De</span>
+            <input type="date" value={dataInicial} onChange={(e) => setDataInicial(e.target.value)} className="bg-transparent outline-none" />
+          </label>
+
+          <label className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm">
+            <span className="text-muted-foreground">Até</span>
+            <input type="date" value={dataFinal} onChange={(e) => setDataFinal(e.target.value)} className="bg-transparent outline-none" />
+          </label>
+
           <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar OP, material, descrição ou data..." className="min-w-[280px] flex-1 rounded-md border bg-background px-3 py-2 text-sm" />
-          <button type="button" onClick={() => { setClasseSelecionada("TODAS"); setStatusSelecionado("TODOS"); setBusca("") }} className="rounded-md border px-3 py-2 text-sm">Limpar filtros</button>
+          <button type="button" onClick={() => { setClasseSelecionada("TODAS"); setStatusSelecionado("TODOS"); setDataInicial(""); setDataFinal(""); setBusca("") }} className="rounded-md border px-3 py-2 text-sm">Limpar filtros</button>
         </div>
 
         <div className="overflow-x-auto">
