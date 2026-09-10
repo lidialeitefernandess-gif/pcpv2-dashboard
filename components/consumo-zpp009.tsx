@@ -224,6 +224,7 @@ const pendentes = useMemo(() => {
             <thead>
               <tr className="border-b text-left">
                 <th className="p-3">OP</th>
+                <th className="p-3">Data</th>
                 <th className="p-3">
                   Material
                 </th>
@@ -257,6 +258,9 @@ const pendentes = useMemo(() => {
                   >
                     <td className="p-3 font-mono">
                       {item.op}
+                      <td className="p-3">
+  {item.data}
+</td>
                     </td>
 
                     <td className="p-3">
