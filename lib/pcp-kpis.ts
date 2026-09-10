@@ -57,9 +57,10 @@ export function computeKpis(ops: OP[]): Kpis {
     (o) => normalizarStatus(o.status) === "parada"
   ).length
   const opsAguardandoMaterial = ops.filter((o) => o.fornecida < o.planejada).length
-  const opsLiberadas = ops.filter(
-    (o) => normalizarStatus(o.status) === "liberada"
-  ).length
+ const opsLiberadas = ops.filter((o) => {
+  const status = normalizarStatus(o.status)
+  return status === "liberada" || status === "em producao"
+}).length
   const backlog = qtdPlanejada - qtdProduzida
 
  const opsFechadas = ops.filter(
