@@ -42,7 +42,9 @@ export function computeKpis(ops: OP[]): Kpis {
   const ordensPlanejadas = ops.length
   const producaoRealizada = ops.filter((o) => o.produzida > 0).length
   const opsAtrasadas = ops.filter((o) => o.diasAtraso > 0).length
-  const opsEmProducao = ops.filter((o) => o.status === "Em Produção").length
+  const opsEmProducao = ops.filter(
+  (o) => o.status?.trim().toLowerCase() === "em produção"
+).length
   const opsParadas = ops.filter((o) => o.status === "Parada").length
   const opsAguardandoMaterial = ops.filter((o) => o.fornecida < o.planejada).length
  const opsLiberadas = ops.filter(
