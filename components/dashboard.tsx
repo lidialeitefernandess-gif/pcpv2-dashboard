@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import {
   Activity,
   AlertTriangle,
@@ -12,6 +13,7 @@ import {
   Layers,
   PauseCircle,
   PackageSearch,
+  RefreshCw,
   Timer,
 } from "lucide-react"
 
@@ -74,6 +76,12 @@ export function Dashboard({
   consumoZpp009: ConsumoZpp009Item[]
 }) {
   const [modelo, setModelo] = useState<string>("Todos")
+  const router = useRouter()
+  const [atualizando, startTransition] = useTransition()
+
+  const atualizarDados = () => {
+    startTransition(() => router.refresh())
+  }
 
   const filtered = useMemo(() => (modelo === "Todos" ? ops : ops.filter((o) => o.modelo === modelo)), [ops, modelo])
 
@@ -106,7 +114,16 @@ export function Dashboard({
             <p className="text-sm text-muted-foreground">Planejamento e Controle da Produção — Chassis</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-end gap-3">
+          <button
+            type="button"
+            onClick={atualizarDados}
+            disabled={atualizando}
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-card px-4 text-sm font-medium transition hover:bg-muted disabled:opacity-60"
+          >
+            <RefreshCw className={`size-4 ${atualizando ? "animate-spin" : ""}`} />
+            {atualizando ? "Atualizando..." : "Atualizar dados"}
+          </button>
           <div className="flex flex-col gap-1">
             <span className="text-[0.68rem] uppercase tracking-wider text-muted-foreground">Modelo</span>
             <Select value={modelo} onValueChange={setModelo}>
