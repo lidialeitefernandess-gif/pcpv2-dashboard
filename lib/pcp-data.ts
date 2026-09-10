@@ -104,20 +104,7 @@ function parseCSV(text: string): string[][] {
   return rows
 }
 
-let cache: {
-  data: PcpData
-  timestamp: number
-} | null = null
-
-const CACHE_TIME = 1 * 60 * 1000
-
 export async function loadPcpData(): Promise<PcpData> {
-  const now = Date.now()
-
-  if (cache && now - cache.timestamp < CACHE_TIME) {
-    return cache.data
-  }
-
   const url =
     `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq` +
     `?sheet=${encodeURIComponent(SHEET_NAME)}` +
@@ -199,11 +186,6 @@ export async function loadPcpData(): Promise<PcpData> {
     atualizadoEm: new Date().toISOString(),
   }
 
-  cache = {
-    data,
-    timestamp: now,
-  }
-
   return data
 }
 
@@ -237,7 +219,7 @@ const idxData = headers.indexOf("DATA")
 const idxSAP = headers.indexOf("SAP")
 const idxDescricao = headers.indexOf("DESCRIÇÃO")
 const idxClasse = headers.indexOf("CLASSE A/B/C")
-const idxBOM = headers.indexOf("BOM")
+const idxPlanejado = headers.indexOf("PLANEJADO")
 const idxConsumo = headers.indexOf("CONSUMO 261")
 const idxStatus = headers.indexOf("STATUS")
 
@@ -255,7 +237,7 @@ return dataRows
       .trim()
       .toUpperCase()
 
-    const necessario = num(row[idxBOM])
+    const necessario = num(row[idxPlanejado])
 const consumido = num(row[idxConsumo])
 
 const status = String(row[idxStatus] ?? "")

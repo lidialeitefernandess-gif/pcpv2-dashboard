@@ -32,7 +32,14 @@ export type Kpis = {
   qtdProduzida: number
 }
 
-const STATUS_LIBERADA = ["Liberada", "Ordem apontada em aberto", "Aguardando apontamento em aberta"]
+function normalizarStatus(value: string | null | undefined): string {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase()
+}
 
 export function computeKpis(ops: OP[]): Kpis {
   const qtdPlanejada = ops.reduce((a, o) => a + o.planejada, 0)
@@ -42,14 +49,17 @@ export function computeKpis(ops: OP[]): Kpis {
   const ordensPlanejadas = ops.length
   const producaoRealizada = ops.filter((o) => o.produzida > 0).length
   const opsAtrasadas = ops.filter((o) => o.diasAtraso > 0).length
+  // Os cards abaixo leem a MESMA coluna Status da BASE_OP.
   const opsEmProducao = ops.filter(
-  (o) => o.status?.trim().toLowerCase().includes("produção")
-).length
-  const opsParadas = ops.filter((o) => o.status === "Parada").length
+    (o) => normalizarStatus(o.status) === "em producao"
+  ).length
+  const opsParadas = ops.filter(
+    (o) => normalizarStatus(o.status) === "parada"
+  ).length
   const opsAguardandoMaterial = ops.filter((o) => o.fornecida < o.planejada).length
- const opsLiberadas = ops.filter(
-  (o) => o.status?.trim().toLowerCase() === "liberada"
-).length
+  const opsLiberadas = ops.filter(
+    (o) => normalizarStatus(o.status) === "liberada"
+  ).length
   const backlog = qtdPlanejada - qtdProduzida
 
  const opsFechadas = ops.filter(
