@@ -11,6 +11,7 @@ export type PcpData = {
 }
 export type ConsumoZpp009Item = {
   op: string
+  data: string
   material: string
   descricao: string
   classe: string
@@ -232,6 +233,7 @@ if (!rows.length) {
 const headers = rows[0].map((h) => h.trim().toUpperCase())
 
 const idxOP = headers.indexOf("OP")
+const idxData = headers.indexOf("DATA")
 const idxSAP = headers.indexOf("SAP")
 const idxDescricao = headers.indexOf("DESCRIÇÃO")
 const idxClasse = headers.indexOf("CLASSE A/B/C")
@@ -245,6 +247,7 @@ return dataRows
   .filter((row) => String(row[idxOP] ?? "").trim() !== "")
   .map((row) => {
     const op = String(row[idxOP] ?? "").trim()
+    const data = String(row[idxData] ?? "").trim()
     const material = String(row[idxSAP] ?? "").trim()
     const descricao = String(row[idxDescricao] ?? "").trim()
 
@@ -266,6 +269,7 @@ const status = String(row[idxStatus] ?? "")
       )
 
       return {
+        data,
         op,
         material,
         descricao,
